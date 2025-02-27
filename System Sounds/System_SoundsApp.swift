@@ -11,7 +11,7 @@ import SwiftUI
 struct System_SoundsApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            HomeView()
         }
     }
 }
