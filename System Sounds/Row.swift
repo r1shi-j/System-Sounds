@@ -16,7 +16,7 @@ struct Row: View {
                 Text(sound.name)
             } label: {
                 Text(String(sound.number))
-                    .foregroundStyle(.black)
+                    .foregroundStyle(Color(uiColor: .label))
             }
         }
     }
