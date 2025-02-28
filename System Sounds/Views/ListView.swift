@@ -11,11 +11,13 @@ import SwiftUI
 struct ListView: View {
     let isFavouriteView: Bool
     let searchText: String
+    var isShowingSettingsSheet: Binding<Bool>
     @Query private var sounds: [Sound]
     
-    init(isFavouriteView: Bool, searchText: String) {
+    init(isFavouriteView: Bool, searchText: String, isShowingSettingsSheet: Binding<Bool>) {
         self.isFavouriteView = isFavouriteView
         self.searchText = searchText
+        self.isShowingSettingsSheet = isShowingSettingsSheet
         
         _sounds = Query(filter: #Predicate {
             if isFavouriteView {
@@ -36,12 +38,13 @@ struct ListView: View {
     
     var body: some View {
         NavigationStack {
-            viewContent
+            content
                 .navigationTitle("\(isFavouriteView ? "Favourite" : "System") Sounds")
+                .toolbar { ToolbarItem(placement: .topBarTrailing) { settingsButton } }
         }
     }
     
-    private var viewContent: some View {
+    private var content: some View {
         Group {
             if sounds.isEmpty {
                 unavailableView
@@ -61,25 +64,38 @@ struct ListView: View {
         }
     }
     
-    private var list: some View{
+    private var list: some View {
         List(sounds) { sound in
             Row(sound: sound)
                 .swipeActions(allowsFullSwipe: true) {
                     Button {
-                        sound.isFavourite.toggle()
+                        toggleFavourite(for: sound)
                     } label: {
                         Label("Favourite", systemImage: "star")
                             .symbolVariant(sound.isFavourite ? .slash : .fill)
                     }
                     .tint(sound.isFavourite ? .red : .orange)
                 }
+                .sensoryFeedback(trigger: sound.isFavourite) { _, newValue in
+                    newValue ? .success : .error
+                }
         }
-        .scrollIndicators(.hidden)
+    }
+    
+    private var settingsButton: some View {
+        Button("Settings", systemImage: "gearshape.fill") {
+            isShowingSettingsSheet.wrappedValue.toggle()
+        }
+    }
+    
+    private func toggleFavourite(for sound: Sound) {
+        sound.isFavourite.toggle()
     }
 }
 
 #Preview {
+    @Previewable @State var isShowing = false
     NavigationStack {
-        ListView(isFavouriteView: false, searchText: "")
+        ListView(isFavouriteView: false, searchText: "", isShowingSettingsSheet: $isShowing)
     }
 }

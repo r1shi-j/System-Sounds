@@ -44,6 +44,7 @@ struct System_SoundsApp: App {
     var body: some Scene {
         WindowGroup {
             HomeView()
+                .environment(\.customAccentColor, CustomColorStore())
         }
         .modelContainer(container)
     }
