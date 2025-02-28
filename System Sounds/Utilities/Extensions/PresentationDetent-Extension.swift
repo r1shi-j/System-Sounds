@@ -9,22 +9,21 @@ import SwiftUI
 
 extension PresentationDetent {
     static var `default`: Self { .large }
+    static var allCases: Set<Self> { [.large, .medium, .fraction(0.3)] }
     
     var rawValue: String {
         switch self {
-            case .large: return "large"
-            case .medium: return "medium"
-            case .fraction(0.25): return "fraction:0.25"
-            default: return "large"
+            case .large: "large"
+            case .medium: "medium"
+            default: "fraction"
         }
     }
     
     static func from(rawValue: String) -> PresentationDetent {
         switch rawValue {
-            case "large": return .large
-            case "medium": return .medium
-            case "fraction:0.25": return .fraction(0.25)
-            default: return .default
+            case "large": .large
+            case "medium": .medium
+            default: .fraction(0.3)
         }
     }
 }

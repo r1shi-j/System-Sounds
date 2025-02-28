@@ -26,7 +26,7 @@ struct HomeView: View {
         .searchable(text: $viewModel.searchText, placement: .navigationBarDrawer, prompt: Text("Search for a sound..."))
         .sheet(isPresented: $viewModel.isShowingSettingsSheet) {
             SettingsView(settingsSheetSize: viewModel.settingsSheetSize)
-                .presentationDetents([.large, .medium, .fraction(0.2)], selection: $viewModel.settingsSheetSize)
+                .presentationDetents(PresentationDetent.allCases, selection: $viewModel.settingsSheetSize)
                 .sensoryFeedback(.selection, trigger: viewModel.settingsSheetSize)
         }
         .onAppear(perform: viewModel.setSheetSize)

@@ -36,7 +36,7 @@ extension Color {
     func toHex() -> String {
         let uic = UIColor(self)
         guard let components = uic.cgColor.components, components.count >= 3 else {
-            return Color.default
+            return String.defaultBlueHex
         }
         let r = Float(components[0])
         let g = Float(components[1])
@@ -67,10 +67,7 @@ extension Color {
         Color.purple.toHex(),
         Color.pink.toHex(),
         Color.brown.toHex(),
-        Color.gray.toHex(),
-        Color.black.toHex()
+        Color.gray.toHex()
     ]
-    
-    static let `default` = "007AFF"
 }
 
