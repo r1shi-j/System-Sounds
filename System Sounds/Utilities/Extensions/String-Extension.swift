@@ -15,7 +15,6 @@ extension String {
     }
     
     func hexAsColorName() -> String {
-        print(self, self.description)
         return switch self {
             case "FF3B30", "FF453A": "red"
             case "FF9500", "FF9F0A": "orange"
