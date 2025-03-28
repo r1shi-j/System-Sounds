@@ -15,11 +15,11 @@ struct HomeView: View {
     var body: some View {
         TabView {
             Tab("", systemImage: "music.note.list") {
-                ListView(isFavouriteView: false, searchText: viewModel.searchText, isShowingSettingsSheet: $viewModel.isShowingSettingsSheet)
+                ListView(isFavouriteView: false, searchText: viewModel.searchText, isShowingSettingsSheet: $viewModel.isShowingSettingsSheet, isShowingInfoSheet: $viewModel.isShowingInfoSheet)
             }
             
             Tab("", systemImage: "airpodsmax") {
-                ListView(isFavouriteView: true, searchText: viewModel.searchText, isShowingSettingsSheet: $viewModel.isShowingSettingsSheet)
+                ListView(isFavouriteView: true, searchText: viewModel.searchText, isShowingSettingsSheet: $viewModel.isShowingSettingsSheet, isShowingInfoSheet: $viewModel.isShowingInfoSheet)
             }
         }
         .tint(customColor.color.hexToColor())
@@ -28,6 +28,10 @@ struct HomeView: View {
             SettingsView(settingsSheetSize: viewModel.settingsSheetSize)
                 .presentationDetents(PresentationDetent.allCases, selection: $viewModel.settingsSheetSize)
                 .sensoryFeedback(.selection, trigger: viewModel.settingsSheetSize)
+        }
+        .sheet(isPresented: $viewModel.isShowingInfoSheet) {
+            InfoView()
+                .presentationDetents([.fraction(0.8)])
         }
         .onAppear(perform: viewModel.setSheetSize)
         .onChange(of: viewModel.settingsSheetSize, viewModel.changeSheetSize)

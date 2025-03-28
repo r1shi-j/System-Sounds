@@ -12,6 +12,7 @@ extension HomeView {
     class ViewModel {
         var searchText: String = ""
         var isShowingSettingsSheet = false
+        var isShowingInfoSheet = false
         
         @ObservationIgnored @AppStorage("settingsSheetSize")
         var settingsSheetSizeRaw: String = PresentationDetent.default.rawValue

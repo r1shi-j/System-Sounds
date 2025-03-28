@@ -12,12 +12,14 @@ struct ListView: View {
     let isFavouriteView: Bool
     let searchText: String
     var isShowingSettingsSheet: Binding<Bool>
+    var isShowingInfoSheet: Binding<Bool>
     @Query private var sounds: [Sound]
     
-    init(isFavouriteView: Bool, searchText: String, isShowingSettingsSheet: Binding<Bool>) {
+    init(isFavouriteView: Bool, searchText: String, isShowingSettingsSheet: Binding<Bool>, isShowingInfoSheet: Binding<Bool>) {
         self.isFavouriteView = isFavouriteView
         self.searchText = searchText
         self.isShowingSettingsSheet = isShowingSettingsSheet
+        self.isShowingInfoSheet = isShowingInfoSheet
         
         _sounds = Query(filter: #Predicate {
             if isFavouriteView {
@@ -40,7 +42,7 @@ struct ListView: View {
         NavigationStack {
             content
                 .navigationTitle("\(isFavouriteView ? "Favourite" : "System") Sounds")
-                .toolbar { ToolbarItem(placement: .topBarTrailing) { settingsButton } }
+                .toolbar(content: toolbarContent)
         }
     }
     
@@ -82,9 +84,19 @@ struct ListView: View {
         }
     }
     
-    private var settingsButton: some View {
-        Button("Settings", systemImage: "gearshape.fill") {
-            isShowingSettingsSheet.wrappedValue.toggle()
+    private func toolbarContent() -> some ToolbarContent {
+        Group {
+            ToolbarItem(placement: .topBarLeading) {
+                Button("Info", systemImage: "info.circle") {
+                    isShowingInfoSheet.wrappedValue.toggle()
+                }
+            }
+            
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Settings", systemImage: "gearshape") {
+                    isShowingSettingsSheet.wrappedValue.toggle()
+                }
+            }
         }
     }
     
@@ -94,8 +106,9 @@ struct ListView: View {
 }
 
 #Preview {
-    @Previewable @State var isShowing = false
+    @Previewable @State var isShowingSettings = false
+    @Previewable @State var isShowingInfo = false
     NavigationStack {
-        ListView(isFavouriteView: false, searchText: "", isShowingSettingsSheet: $isShowing)
+        ListView(isFavouriteView: false, searchText: "", isShowingSettingsSheet: $isShowingSettings, isShowingInfoSheet: $isShowingInfo)
     }
 }
