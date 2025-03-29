@@ -26,32 +26,17 @@ struct Row: View {
         }
     }
     
-    private func soundTypeImage() -> some View {
-        switch (sound.audioType, sound.audioTypeSilentMode) {
-            case (AudioType.haptic.rawValue, AudioType.haptic.rawValue):
-                Image(systemName: "iphone.radiowaves.left.and.right")
-                    .tint(.red)
-                
-            case (AudioType.sound.rawValue, AudioType.sound.rawValue):
-                Image(systemName: "speaker.wave.2")
-                    .tint(.red)
-                
-            case (AudioType.soundAndHaptic.rawValue, AudioType.soundAndHaptic.rawValue):
-                Image(systemName: "bell")
-                    .tint(.red)
-                
-            case (AudioType.sound.rawValue, AudioType.none.rawValue):
-                Image(systemName: "speaker.wave.2")
-                    .tint(.blue)
-                
-            case (AudioType.soundAndHaptic.rawValue, AudioType.haptic.rawValue):
-                Image(systemName: "bell")
-                    .tint(.blue)
-                
-            default:
-                Image(systemName: "questionmark")
-                    .tint(.secondary)
+    private func imageTintColor() -> Color {
+        switch sound.audioType {
+            case AudioType.hapticOnly.rawValue, AudioType.soundOnly.rawValue, AudioType.hapticAndSound.rawValue: .red
+            case AudioType.soundToNone.rawValue, AudioType.hapticAndSoundToHaptic.rawValue: .blue
+            default: .secondary
         }
+    }
+    
+    private func soundTypeImage() -> some View {
+        Image(systemName: (AudioType(rawValue: sound.audioType)?.systemImageName) ?? "questionmark")
+            .tint(imageTintColor())
     }
     
     private func loudSoundImage() -> some View {

@@ -11,17 +11,24 @@ import SwiftUI
 struct ListView: View {
     let isFavouriteView: Bool
     let searchText: String
-    var isShowingSettingsSheet: Binding<Bool>
-    var isShowingInfoSheet: Binding<Bool>
+    let filterType: AudioType?
     @Query private var sounds: [Sound]
     
-    init(isFavouriteView: Bool, searchText: String, isShowingSettingsSheet: Binding<Bool>, isShowingInfoSheet: Binding<Bool>) {
+    init(isFavouriteView: Bool, searchText: String, sortOption: SortOption, sortOrder: SortOrder, filterType: AudioType?) {
         self.isFavouriteView = isFavouriteView
         self.searchText = searchText
-        self.isShowingSettingsSheet = isShowingSettingsSheet
-        self.isShowingInfoSheet = isShowingInfoSheet
+        self.filterType = filterType
         
-        _sounds = Query(filter: #Predicate {
+        let sortDescriptors: [SortDescriptor<Sound>] = switch sortOption {
+            case .name:
+                [SortDescriptor(\Sound.name, comparator: .localizedStandard, order: sortOrder.asFoundation), SortDescriptor(\Sound.number, order: .forward)]
+            case .number:
+                [SortDescriptor(\Sound.number, order: sortOrder.asFoundation)]
+            case .soundType:
+                [SortDescriptor(\Sound.audioType, order: sortOrder.asFoundation), SortDescriptor(\Sound.number, order: .forward)]
+        }
+        
+        let predicate = #Predicate<Sound> {
             if isFavouriteView {
                 if searchText.isEmpty {
                     return $0.isFavourite
@@ -35,28 +42,31 @@ struct ListView: View {
                     return $0.number.localizedStandardContains(searchText) || $0.name.localizedStandardContains(searchText)
                 }
             }
-        }, sort: \Sound.number)
-    }
-    
-    var body: some View {
-        NavigationStack {
-            content
-                .navigationTitle("\(isFavouriteView ? "Favourite" : "System") Sounds")
-                .toolbar(content: toolbarContent)
         }
+        _sounds = Query(filter: predicate, sort: sortDescriptors)
     }
     
-    private var content: some View {
-        Group {
-            if sounds.isEmpty {
-                unavailableView
+    private var filteredSounds: [Sound] {
+        sounds.filter {
+            if filterType == nil {
+                true
+            } else if filterType == AudioType.isLoudSound {
+                $0.isLoudSound
             } else {
-                list
+                $0.audioType == filterType?.rawValue
             }
         }
     }
     
-    private var unavailableView: some View {
+    var body: some View {
+        if filteredSounds.isEmpty {
+            unavailableView()
+        } else {
+            list()
+        }
+    }
+    
+    private func unavailableView() -> some View {
         Group {
             if searchText.isEmpty {
                 ContentUnavailableView("You haven't added any favourites yet!", systemImage: "star.slash", description: Text("Swipe right on a sound to favourite it."))
@@ -66,8 +76,8 @@ struct ListView: View {
         }
     }
     
-    private var list: some View {
-        List(sounds) { sound in
+    private func list() -> some View {
+        List(filteredSounds) { sound in
             Row(sound: sound)
                 .swipeActions(allowsFullSwipe: true) {
                     Button {
@@ -84,22 +94,6 @@ struct ListView: View {
         }
     }
     
-    private func toolbarContent() -> some ToolbarContent {
-        Group {
-            ToolbarItem(placement: .topBarLeading) {
-                Button("Info", systemImage: "info.circle") {
-                    isShowingInfoSheet.wrappedValue.toggle()
-                }
-            }
-            
-            ToolbarItem(placement: .topBarTrailing) {
-                Button("Settings", systemImage: "gearshape") {
-                    isShowingSettingsSheet.wrappedValue.toggle()
-                }
-            }
-        }
-    }
-    
     private func toggleFavourite(for sound: Sound) {
         sound.isFavourite.toggle()
     }
@@ -109,6 +103,6 @@ struct ListView: View {
     @Previewable @State var isShowingSettings = false
     @Previewable @State var isShowingInfo = false
     NavigationStack {
-        ListView(isFavouriteView: false, searchText: "", isShowingSettingsSheet: $isShowingSettings, isShowingInfoSheet: $isShowingInfo)
+        ListView(isFavouriteView: false, searchText: "", sortOption: .name, sortOrder: .forward, filterType: .soundOnly)
     }
 }
