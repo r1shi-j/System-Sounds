@@ -6,10 +6,8 @@
 //
 
 import AudioToolbox
-import SwiftData
 
-@Model
-class Sound {
+struct Sound: Identifiable {
     var id = UUID()
     var number: String
     var name: String

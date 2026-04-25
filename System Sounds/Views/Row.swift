@@ -12,16 +12,15 @@ struct Row: View {
     
     var body: some View {
         Button(action: sound.playSound) {
-            LabeledContent {
+            HStack {
+                Text(sound.number)
+                    .foregroundStyle(Color(uiColor: .label))
+                    .frame(maxWidth: 40, alignment: .leading)
+                soundTypeImage()
+                loudSoundImage()
+                Spacer()
                 Text(sound.name)
-            } label: {
-                HStack {
-                    Text(sound.number)
-                        .foregroundStyle(Color(uiColor: .label))
-                        .frame(maxWidth: 40, alignment: .leading)
-                    soundTypeImage()
-                    loudSoundImage()
-                }
+                    .foregroundColor(.secondary)
             }
         }
     }
